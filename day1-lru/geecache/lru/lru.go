@@ -21,7 +21,7 @@ type Value interface {
 	Len() int
 }
 
-// New is the Constructor of Cache
+// New is the Constructor of Cache 初始化一个缓存结构体
 func New(maxBytes int64, onEvicted func(string, Value)) *Cache {
 	return &Cache{
 		maxBytes:  maxBytes,
@@ -31,15 +31,18 @@ func New(maxBytes int64, onEvicted func(string, Value)) *Cache {
 	}
 }
 
-// Add adds a value to the cache.
+// Add adds a value to the cache. 向缓存中添加一个键值对
 func (c *Cache) Add(key string, value Value) {
 	if ele, ok := c.cache[key]; ok {
-		c.ll.MoveToFront(ele)
+		//访问命中
+		c.ll.MoveToFront(ele) //将元素移动到头部
+		//计算内存占用
 		kv := ele.Value.(*entry)
 		c.nbytes += int64(value.Len()) - int64(kv.value.Len())
 		kv.value = value
 	} else {
-		ele := c.ll.PushFront(&entry{key, value})
+		//在头部插入一个新元素
+		ele := c.ll.PushFront(&entry{key, value}) //返回新元素指针
 		c.cache[key] = ele
 		c.nbytes += int64(len(key)) + int64(value.Len())
 	}
@@ -74,5 +77,6 @@ func (c *Cache) RemoveOldest() {
 
 // Len the number of cache entries
 func (c *Cache) Len() int {
+	//Len()是container/list的内置方法，返回双向链表的元素个数
 	return c.ll.Len()
 }
