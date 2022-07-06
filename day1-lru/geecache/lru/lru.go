@@ -4,12 +4,11 @@ import "container/list"
 
 // Cache is a LRU cache. It is not safe for concurrent access.
 type Cache struct {
-	maxBytes int64
-	nbytes   int64
-	ll       *list.List
-	cache    map[string]*list.Element
-	// optional and executed when an entry is purged.
-	OnEvicted func(key string, value Value)
+	maxBytes  int64                         //允许使用的最大内存
+	nbytes    int64                         //当前已使用内存
+	ll        *list.List                    //双向链表指针
+	cache     map[string]*list.Element      //key:string,value:指向链表元素的指针
+	OnEvicted func(key string, value Value) // 可选，删除记录时的回调函数
 }
 
 type entry struct {
