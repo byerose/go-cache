@@ -52,9 +52,10 @@ func (c *Cache) Add(key string, value Value) {
 	}
 }
 
-// Get look ups a key's value
+// Get look ups a key's value 获取元素值
 func (c *Cache) Get(key string) (value Value, ok bool) {
 	if ele, ok := c.cache[key]; ok {
+		//访问命中，元素移到头部
 		c.ll.MoveToFront(ele)
 		kv := ele.Value.(*entry)
 		return kv.value, true
@@ -62,7 +63,7 @@ func (c *Cache) Get(key string) (value Value, ok bool) {
 	return
 }
 
-// RemoveOldest removes the oldest item
+// RemoveOldest removes the oldest item  移除一个最近最少访问的元素
 func (c *Cache) RemoveOldest() {
 	ele := c.ll.Back()
 	if ele != nil {
