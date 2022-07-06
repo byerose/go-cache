@@ -46,6 +46,7 @@ func (c *Cache) Add(key string, value Value) {
 		c.cache[key] = ele
 		c.nbytes += int64(len(key)) + int64(value.Len())
 	}
+	//处理超出内存上限的情况
 	for c.maxBytes != 0 && c.maxBytes < c.nbytes {
 		c.RemoveOldest()
 	}
@@ -65,10 +66,13 @@ func (c *Cache) Get(key string) (value Value, ok bool) {
 func (c *Cache) RemoveOldest() {
 	ele := c.ll.Back()
 	if ele != nil {
+		//Remove()是container/list的内置方法，删除链表中的元素
 		c.ll.Remove(ele)
 		kv := ele.Value.(*entry)
-		delete(c.cache, kv.key)
+		delete(c.cache, kv.key) //内置delet()，对map执行删除操作
+		//更新占用内存
 		c.nbytes -= int64(len(kv.key)) + int64(kv.value.Len())
+		//移除时调用回调函数
 		if c.OnEvicted != nil {
 			c.OnEvicted(kv.key, kv.value)
 		}
