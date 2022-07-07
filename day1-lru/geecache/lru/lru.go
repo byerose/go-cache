@@ -63,6 +63,7 @@ func (c *Cache) Add(key string, value Value) {
 		c.nbytes += int64(len(key)) + int64(value.Len())
 	}
 	//处理超出内存上限的情况
+	//先添加后删除 or 先删除后添加
 	for c.maxBytes != 0 && c.maxBytes < c.nbytes {
 		c.RemoveOldest()
 	}

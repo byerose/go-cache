@@ -89,3 +89,16 @@ func TestAddStruct(t *testing.T) {
 		t.Fatal("expected 55 but got", lru.nbytes)
 	}
 }
+
+func TestRoutine(t *testing.T) {
+	lru := New(int64(0), nil)
+
+	go lru.Add("Jack", String("man"))
+	go lru.Add("Tom", String("man"))
+	go lru.Add("Rose", String("woman"))
+
+	if lru.nbytes != 22 {
+		t.Fatal("should be 22, got", lru.nbytes)
+	}
+
+}
