@@ -93,10 +93,22 @@ func TestAddStruct(t *testing.T) {
 func TestRoutine(t *testing.T) {
 	lru := New(int64(0), nil)
 
-	go lru.Add("Jack", String("man"))
-	go lru.Add("Tom", String("man"))
-	go lru.Add("Rose", String("woman"))
+	wg.Add(3)
 
+	go func() {
+		lru.Add("Jack", String("man"))
+		wg.Done()
+	}()
+	go func() {
+		lru.Add("Tom", String("man"))
+		wg.Done()
+	}()
+	go func() {
+		lru.Add("Rose", String("woman"))
+		wg.Done()
+	}()
+
+	wg.Wait()
 	if lru.nbytes != 22 {
 		t.Fatal("should be 22, got", lru.nbytes)
 	}

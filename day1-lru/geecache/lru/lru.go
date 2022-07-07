@@ -2,6 +2,7 @@ package lru
 
 import (
 	"container/list"
+	"sync"
 )
 
 /*Notes
@@ -16,6 +17,9 @@ type Element struct {
 	Value      any      //存储值，any是空接口interface{}的别名，空接口可以表示任意数据类型
 }
 */
+
+var wg sync.WaitGroup
+var rwm sync.RWMutex
 
 // Cache is a LRU cache. It is not safe for concurrent access.
 type Cache struct {
@@ -49,6 +53,7 @@ func New(maxBytes int64, onEvicted func(string, Value)) *Cache {
 
 // Add adds a value to the cache. 向缓存中添加一个键值对
 func (c *Cache) Add(key string, value Value) {
+
 	if ele, ok := c.cache[key]; ok {
 		//访问命中
 		c.ll.MoveToFront(ele) //将元素移动到头部
