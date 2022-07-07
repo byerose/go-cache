@@ -3,12 +3,23 @@ package lru
 import (
 	"reflect"
 	"testing"
+	"unsafe"
 )
 
+//Implement Len() of Value Interface
 type String string
 
 func (d String) Len() int {
 	return len(d)
+}
+
+type people struct {
+	name string
+	age  int
+}
+
+func (p people) Len() int {
+	return int(unsafe.Sizeof(p))
 }
 
 func TestGet(t *testing.T) {
@@ -58,8 +69,23 @@ func TestAdd(t *testing.T) {
 	lru := New(int64(0), nil)
 	lru.Add("key", String("1"))
 	lru.Add("key", String("111"))
-
+	t.Log("the number of cache entries:", lru.Len())
 	if lru.nbytes != int64(len("key")+len("111")) {
 		t.Fatal("expected 6 but got", lru.nbytes)
+	}
+}
+
+func TestAddStruct(t *testing.T) {
+	lru := New(int64(0), nil)
+	p1 := people{"Jack", 12}
+	p2 := people{"Tom", 16}
+	lru.Add("Jack", p1)
+	lru.Add("Tom", p2)
+
+	t.Log("the number of cache entries:", lru.Len())
+	t.Log("the number of used bytes:", lru.nbytes)
+
+	if lru.nbytes != int64(unsafe.Sizeof(p1)+unsafe.Sizeof(p2))+int64(len(p1.name)+len(p2.name)) {
+		t.Fatal("expected 55 but got", lru.nbytes)
 	}
 }

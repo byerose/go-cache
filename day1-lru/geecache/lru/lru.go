@@ -1,6 +1,21 @@
 package lru
 
-import "container/list"
+import (
+	"container/list"
+)
+
+/*Notes
+类型断言 var a = x.(T)，如果x不是nil，并且可以转换为T类型，则断言成功，并返回T类型的变量x。
+如果断言失败则会panic。
+
+双向链表中的元素定义
+
+type Element struct {
+	next, prev *Element //指向前后元素的指针
+	list       *List    //元素所属链表的指针
+	Value      any      //存储值，any是空接口interface{}的别名，空接口可以表示任意数据类型
+}
+*/
 
 // Cache is a LRU cache. It is not safe for concurrent access.
 type Cache struct {
@@ -11,6 +26,7 @@ type Cache struct {
 	OnEvicted func(key string, value Value) // 可选，删除记录时的回调函数
 }
 
+//定义链表元素的结构为entry
 type entry struct {
 	key   string
 	value Value
@@ -18,15 +34,15 @@ type entry struct {
 
 // Value use Len to count how many bytes it takes
 type Value interface {
-	Len() int
+	Len() int // Implement in lru_test.go
 }
 
 // New is the Constructor of Cache 初始化一个缓存结构体
 func New(maxBytes int64, onEvicted func(string, Value)) *Cache {
 	return &Cache{
 		maxBytes:  maxBytes,
-		ll:        list.New(),
-		cache:     make(map[string]*list.Element),
+		ll:        list.New(),                     //内置方法，初始化一个双向链表
+		cache:     make(map[string]*list.Element), //初始化map
 		OnEvicted: onEvicted,
 	}
 }
@@ -37,7 +53,7 @@ func (c *Cache) Add(key string, value Value) {
 		//访问命中
 		c.ll.MoveToFront(ele) //将元素移动到头部
 		//计算内存占用
-		kv := ele.Value.(*entry)
+		kv := ele.Value.(*entry) //ele.Value为any类型，转换为entry结构体指针
 		c.nbytes += int64(value.Len()) - int64(kv.value.Len())
 		kv.value = value
 	} else {
