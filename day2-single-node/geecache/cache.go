@@ -11,6 +11,7 @@ type cache struct {
 	cacheBytes int64
 }
 
+//为什么不用读写锁，而用互斥锁？
 func (c *cache) add(key string, value ByteView) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

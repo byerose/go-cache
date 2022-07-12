@@ -52,7 +52,7 @@ func (c *Cache) Add(key string, value Value) {
 // Get look ups a key's value
 func (c *Cache) Get(key string) (value Value, ok bool) {
 	if ele, ok := c.cache[key]; ok {
-		c.ll.MoveToFront(ele)
+		c.ll.MoveToFront(ele) //访问命中，将其放到表头
 		kv := ele.Value.(*entry)
 		return kv.value, true
 	}
