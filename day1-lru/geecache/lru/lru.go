@@ -10,7 +10,6 @@ import (
 如果断言失败则会panic。
 
 双向链表中的元素定义
-
 type Element struct {
 	next, prev *Element //指向前后元素的指针
 	list       *List    //元素所属链表的指针
