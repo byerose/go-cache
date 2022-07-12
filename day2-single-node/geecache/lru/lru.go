@@ -2,6 +2,7 @@ package lru
 
 import "container/list"
 
+//缓存淘汰策略
 // Cache is a LRU cache. It is not safe for concurrent access.
 type Cache struct {
 	maxBytes int64

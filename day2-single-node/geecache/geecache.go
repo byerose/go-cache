@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+//与外部交互
+
 // A Group is a cache namespace and associated data loaded spread over
 type Group struct {
 	name      string
@@ -22,12 +24,13 @@ type Getter interface {
 type GetterFunc func(key string) ([]byte, error)
 
 // Get implements Getter interface function
+//函数类型实现某一个接口，称之为接口型函数，方便使用者在调用时既能够传入函数作为参数，也能够传入实现了该接口的结构体作为参数。
 func (f GetterFunc) Get(key string) ([]byte, error) {
 	return f(key)
 }
 
 var (
-	mu     sync.RWMutex
+	mu     sync.RWMutex //读写锁
 	groups = make(map[string]*Group)
 )
 
@@ -62,12 +65,12 @@ func (g *Group) Get(key string) (ByteView, error) {
 		return ByteView{}, fmt.Errorf("key is required")
 	}
 
-	if v, ok := g.mainCache.get(key); ok {
+	if v, ok := g.mainCache.get(key); ok { //如果命中则返回缓存值
 		log.Println("[GeeCache] hit")
 		return v, nil
 	}
 
-	return g.load(key)
+	return g.load(key) //否则调用load()
 }
 
 func (g *Group) load(key string) (value ByteView, err error) {
@@ -75,13 +78,13 @@ func (g *Group) load(key string) (value ByteView, err error) {
 }
 
 func (g *Group) getLocally(key string) (ByteView, error) {
-	bytes, err := g.getter.Get(key)
+	bytes, err := g.getter.Get(key) //调用回调函数得到源数据
 	if err != nil {
 		return ByteView{}, err
 
 	}
 	value := ByteView{b: cloneBytes(bytes)}
-	g.populateCache(key, value)
+	g.populateCache(key, value) //将源数据加入到缓存
 	return value, nil
 }
 

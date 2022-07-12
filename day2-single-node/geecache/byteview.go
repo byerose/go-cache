@@ -1,5 +1,7 @@
 package geecache
 
+//缓存值的抽象
+
 // A ByteView holds an immutable view of bytes.
 //使用[]byte保存真实的缓存值，可以存储字符串图片等类型
 type ByteView struct {

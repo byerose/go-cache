@@ -19,6 +19,7 @@ func TestGetter(t *testing.T) {
 	})
 
 	expect := []byte("key")
+	//reflect.DeepEqual(x any,y any)判断两个值是否深度相等，包括可迭代对象的元素
 	if v, _ := f.Get("key"); !reflect.DeepEqual(v, expect) {
 		t.Fatal("callback failed")
 	}
