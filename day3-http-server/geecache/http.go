@@ -60,3 +60,7 @@ func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/octet-stream")
 	w.Write(view.ByteSlice())
 }
+
+//首先判断访问路径的前缀是否是 basePath，不是返回错误。
+//我们约定访问路径格式为 /<basepath>/<groupname>/<key>，通过 groupname 得到 group 实例，再使用 group.Get(key) 获取缓存数据。
+//最终使用 w.Write() 将缓存值作为 httpResponse 的 body 返回
